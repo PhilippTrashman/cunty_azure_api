@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: cuntydb
+    ports:
+      - 6971:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+  test_db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test_db
+    ports:
+      - 6972:5432
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data/
+volumes:
+  postgres_data:
+  test_postgres_data:

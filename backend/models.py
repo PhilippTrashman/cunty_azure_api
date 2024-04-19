@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Boolean, create_engine
-from sqlalchemy.orm import relationship, sessionmaker, Session
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Boolean, create_engine, text
+from sqlalchemy.orm import relationship, sessionmaker, Session, declarative_base
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.schema import CreateTable
 
@@ -8,6 +7,14 @@ from sqlalchemy.schema import CreateTable
 from typing import Optional, List
 from datetime import date
 import uuid
+
+STUDENT1_ID = uuid.UUID('11111111-1111-1111-1111-111111111111')
+STUDENT2_ID = uuid.UUID('22222222-2222-2222-2222-222222222222')
+TEACHER1_ID = uuid.UUID('33333333-3333-3333-3333-333333333333')
+TEACHER2_ID = uuid.UUID('44444444-4444-4444-4444-444444444444')
+PARENT1_ID = uuid.UUID('55555555-5555-5555-5555-555555555555')
+PARENT2_ID = uuid.UUID('66666666-6666-6666-6666-666666666666')
+SU_ID = uuid.UUID('77777777-7777-7777-7777-777777777777')
 
 
 Base = declarative_base()
@@ -235,7 +242,7 @@ class Student(Base):
     __tablename__ = "student"
     id = Column(Integer, primary_key=True)
     account_id = Column(UUID(as_uuid=True), ForeignKey("account.id"), nullable=False, unique=True)
-    school_class_id = Column(Integer, ForeignKey("school_class.id"), nullable=False)
+    school_class_id = Column(Integer, ForeignKey("school_class.id"))
 
     parents = relationship("ParentStudent", back_populates="student")
     account = relationship("Account", back_populates="student")
@@ -334,7 +341,10 @@ class Su(Base):
 class Account(Base):
     __tablename__ = "account"
 
-    id = Column(UUID(as_uuid=True), primary_key=True)
+    id = Column(UUID(as_uuid=True), 
+                primary_key=True, 
+                unique=True, 
+                default=uuid.uuid4())
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     name = Column(String, nullable=False)
@@ -511,10 +521,11 @@ class SchoolSubjectEntry(Base):
     __tablename__ = "school_subject_entry"
 
     id = Column(Integer, primary_key=True)
-    teacher_id = Column(Integer, ForeignKey("teacher.id"), nullable=False)
+    teacher_id = Column(Integer, ForeignKey("teacher.id"))
     subject_id = Column(Integer, ForeignKey("school_subject.id"), nullable=False)
     date = Column(Date, nullable=False)
     note = Column(String)
+
 
     teacher = relationship("Teacher", back_populates="school_subject_entries", lazy="joined")
     subject = relationship("SchoolSubject", back_populates="subject_entries", lazy="joined")
@@ -644,11 +655,12 @@ class AccessToken(Base):
  
 def refresh_db(write_to_file=False, 
                drop_all=False, 
-               url="postgresql://test:test@localhost:6970/test_db", 
+               url="postgresql://postgres:1234@localhost:6971/cuntydb", 
                generate_accounts=False) -> Optional[dict]:
     engine = create_engine(url)
     Session = sessionmaker(engine)
     with engine.connect() as connection:
+        connection.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'))
         # Drop all tables
         if drop_all:
             Base.metadata.drop_all(bind=engine, checkfirst=False)
@@ -664,7 +676,7 @@ def refresh_db(write_to_file=False,
     if generate_accounts:
         session = Session()
         student1_ac = Account(
-            id = uuid.UUID('11111111-1111-1111-1111-111111111111'),
+            id = STUDENT1_ID,
             email = 'student1@test.com',
             password = 'password1',
             name = 'Test',
@@ -673,7 +685,7 @@ def refresh_db(write_to_file=False,
             birthday = date(2000, 1, 1)
         )
         student2_ac = Account(
-            id = uuid.UUID('22222222-2222-2222-2222-222222222222'),
+            id = STUDENT2_ID,
             email = 'student2@test.com',
             password = 'password2',
             name = 'Test',
@@ -682,7 +694,7 @@ def refresh_db(write_to_file=False,
             birthday = date(2000, 1, 1)
         )
         teacher1_ac = Account(
-            id = uuid.UUID('33333333-3333-3333-3333-333333333333'),
+            id = TEACHER1_ID,
             email = 'teacher1@test.com',
             password = 'password3',
             name = 'Test',
@@ -691,7 +703,7 @@ def refresh_db(write_to_file=False,
             birthday = date(2000, 1, 1)
         )
         teacher2_ac = Account(
-            id = uuid.UUID('44444444-4444-4444-4444-444444444444'),
+            id = TEACHER2_ID,
             email = 'teacher2@test.com',
             password = 'password4',
             name = 'Test',
@@ -700,7 +712,7 @@ def refresh_db(write_to_file=False,
             birthday = date(2000, 1, 1)
         )
         parent1_ac = Account(
-            id = uuid.UUID('55555555-5555-5555-5555-555555555555'),
+            id = PARENT1_ID,
             email = 'parent1@test.com',
             password = 'password5',
             name = 'Test',
@@ -709,7 +721,7 @@ def refresh_db(write_to_file=False,
             birthday = date(2000, 1, 1)
         )
         parent2_ac = Account(
-            id = uuid.UUID('66666666-6666-6666-6666-666666666666'),
+            id = PARENT2_ID,
             email = 'parent2@test.com',
             password = 'password6',
             name = 'Test',
@@ -718,7 +730,7 @@ def refresh_db(write_to_file=False,
             birthday = date(2000, 1, 1)
         )
         su_ac = Account(
-            id = uuid.UUID('77777777-7777-7777-7777-777777777777'),
+            id = SU_ID,
             email = 'su@test.com',
             password = 'password7',
             name = 'Test',
@@ -726,24 +738,26 @@ def refresh_db(write_to_file=False,
             username = 'testSU',
             birthday = date(2000, 1, 1)
         )
-        crud = CRUD(session)
-        crud.create(student1_ac)
-        crud.create(student2_ac)
-        crud.create(teacher1_ac)
-        crud.create(teacher2_ac)
-        crud.create(parent1_ac)
-        crud.create(parent2_ac)
-        crud.create(su_ac)
+        crud = CRUD(Session)
+        student1_ac = crud.create(student1_ac)
+        student2_ac = crud.create(student2_ac)
+        teacher1_ac = crud.create(teacher1_ac)
+        teacher2_ac = crud.create(teacher2_ac)
+        parent1_ac = crud.create(parent1_ac)
+        parent2_ac = crud.create(parent2_ac)
+        su_ac = crud.create(su_ac)
 
-        return {
-            'student1': str(student1_ac.id),
-            'student2': str(student2_ac.id),
-            'teacher1': str(teacher1_ac.id),
-            'teacher2': str(teacher2_ac.id),
-            'parent1': str(parent1_ac.id),
-            'parent2': str(parent2_ac.id),
-            'su': str(su_ac.id)
-        }
+        # return {
+        #     'student1': str(student1_ac.id),
+        #     'student2': str(student2_ac.id),
+        #     'teacher1': str(teacher1_ac.id),
+        #     'teacher2': str(teacher2_ac.id),
+        #     'parent1': str(parent1_ac.id),
+        #     'parent2': str(parent2_ac.id),
+        #     'su': str(su_ac.id)
+        # }
 
 
-
+if __name__ == "__main__":
+    refresh_db(write_to_file=True, drop_all=False, generate_accounts=True)
+    print("Database refreshed")
