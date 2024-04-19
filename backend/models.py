@@ -501,6 +501,8 @@ class SchoolSubjectStudent(Base):
         if not from_student and not from_subject:
             data = {
                 "id": self.id,
+                "subject": self.subject.serialize(depth-1),
+                "student": self.student.serialize(depth-1)
             }
 
         elif from_student and not from_subject:
@@ -759,5 +761,5 @@ def refresh_db(write_to_file=False,
 
 
 if __name__ == "__main__":
-    refresh_db(write_to_file=True, drop_all=False, generate_accounts=True)
+    refresh_db(write_to_file=True, drop_all=True, generate_accounts=True)
     print("Database refreshed")

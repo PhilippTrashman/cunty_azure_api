@@ -1,4 +1,5 @@
 version: '3.8'
+name: cunty-azure-api
 services:
   db:
     image: postgres:13
