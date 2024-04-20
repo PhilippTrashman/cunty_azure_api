@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, sessionmaker
 import uuid
 import datetime
 
-class ContactAdapater:
+class ContactAdapter:
     def __init__(self, session: sessionmaker[Session]):
         self.Session = session
 
