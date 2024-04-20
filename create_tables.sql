@@ -7,6 +7,7 @@ CREATE TABLE account (
 	last_name VARCHAR NOT NULL, 
 	username VARCHAR NOT NULL, 
 	birthday DATE, 
+	secret UUID NOT NULL, 
 	PRIMARY KEY (id), 
 	UNIQUE (id), 
 	UNIQUE (email), 

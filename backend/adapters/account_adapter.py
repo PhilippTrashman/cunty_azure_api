@@ -1,4 +1,5 @@
 from backend.models import Account, Base
+from backend.errors import *
 from sqlalchemy.orm import Session, sessionmaker
 import uuid
 import datetime
@@ -43,6 +44,8 @@ class AccountAdapter:
         account = session.query(Account).filter(Account.username == username).first()
         if not account:
             account = session.query(Account).filter(Account.email == username).first()
+        if not account:
+            raise EntityNotFound(f"Account with username or email {username} not found")
         data = account.serialize()
         session.close()
         return data

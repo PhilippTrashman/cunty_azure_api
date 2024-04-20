@@ -8,3 +8,5 @@ azure-functions~=1.17.0
 psycopg2-binary~=2.9.9
 types-psycopg2~=2.9.21.20
 sqlalchemy ~= 2.0.29
+
+schedule~=1.2.1

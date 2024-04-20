@@ -1,6 +1,7 @@
 from backend.models import SchoolSubjectEntry
 from sqlalchemy.orm import Session, sessionmaker
 from datetime import datetime, date
+from backend.errors import *
 
 class SchoolSubjectEntryAdapter:
     def __init__(self, session: sessionmaker[Session]):
@@ -15,6 +16,11 @@ class SchoolSubjectEntryAdapter:
             date = request['date'],
             note = request.get('note', None),
         )
+        check_school_subject_entry = session.query(SchoolSubjectEntry).filter(
+            SchoolSubjectEntry.date == date, SchoolSubjectEntry.subject_id == school_subject_entry.date).first()
+        if check_school_subject_entry:
+            raise SubjectEntryAlreadyExists(f"School subject entry for subject {school_subject_entry.subject_id} and date {school_subject_entry.date} already exists")
+        
         session.add(school_subject_entry)
         session.commit()
         data = school_subject_entry.serialize()

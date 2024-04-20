@@ -1,4 +1,5 @@
 from backend.models import Absence, Base
+from backend.errors import *
 from sqlalchemy.orm import Session, sessionmaker
 import uuid
 import datetime
@@ -9,14 +10,18 @@ class AbsenceAdapter:
 
     def create_abscence(self, request: dict) -> dict:
         session = self.Session()
-        abscence = Absence(
-            account_id = request['account_id'],
-            date = datetime.strptime(request['date'], '%Y-%m-%d').date(),
-            start_time = request['start_time'],
-            end_time = request.get('end_time', None),
-            reason = request['reason'],
-            excused = request.get('excused', False)
-        )
+        try:
+            abscence = Absence(
+                account_id = request['account_id'],
+                date = datetime.strptime(request['date'], '%Y-%m-%d').date(),
+                start_time = request['start_time'],
+                end_time = request.get('end_time', None),
+                reason = request['reason'],
+                excused = request.get('excused', False)
+            )
+        except KeyError as e:
+            raise PayloadError(f"Missing key: {e}")
+        
         session.add(abscence)
         session.commit()
         data = abscence.serialize()
@@ -33,6 +38,8 @@ class AbsenceAdapter:
     def get_abscence(self, abscence_id: int) -> dict:
         session = self.Session()
         abscence = session.query(Absence).filter(Absence.id == abscence_id).first()
+        if not abscence:
+            raise EntityNotFound(f"Absence with id {abscence_id} not found")
         data = abscence.serialize()
         session.close()
         return data
@@ -70,6 +77,8 @@ class AbsenceAdapter:
     def delete_abscence(self, abscence_id: int) -> dict:
         session = self.Session()
         abscence = session.query(Absence).filter(Absence.id == abscence_id).first()
+        if not abscence:
+            raise EntityNotFound(f"Absence with id {abscence_id} not found")
         data = abscence.serialize()
         session.delete(abscence)
         session.commit()

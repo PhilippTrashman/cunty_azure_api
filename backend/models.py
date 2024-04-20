@@ -351,6 +351,7 @@ class Account(Base):
     last_name = Column(String, nullable=False)
     username = Column(String, unique=True, nullable=False)
     birthday = Column(Date)
+    secret = Column(UUID(as_uuid=True), default=uuid.uuid4(), nullable=False)
 
     contacts = relationship("Contact", back_populates="account")
     student = relationship("Student", back_populates="account")
@@ -622,15 +623,16 @@ class AccessToken(Base):
     account_id = Column(UUID(as_uuid=True), ForeignKey("account.id"), nullable=False)
     expiration_date = Column(DateTime, nullable=False)
     creation_date = Column(DateTime, nullable=False)
+    token = Column(String, nullable=False)
 
     account = relationship("Account", back_populates="access_tokens")
 
     def __repr__(self) -> str:
-        return f"AccessToken(token_id={self.id}, account_id={self.account_id}, expiration_date={self.expiration_date}, creation_date={self.creation_date})"
+        return f"AccessToken(id={self.id}, account_id={self.account_id}, expiration_date={self.expiration_date}, creation_date={self.creation_date})"
 
     def serialize(self, depth=1) -> dict:
         data = {
-            "token_id": self.id,
+            "id": self.id,
             "account_id": self.account_id,
             "expiration_date": self.expiration_date,
             "creation_date": self.creation_date
@@ -643,18 +645,6 @@ class AccessToken(Base):
 
         return data
     
-    @staticmethod
-    def get_from_account_id(session, account_id: uuid.UUID) -> Optional[List["AccessToken"]]:
-        return session.query(AccessToken).filter(AccessToken.account_id == account_id).all()
-    
-    @staticmethod
-    def get_from_token_id(session, token_id: uuid.UUID) -> Optional["AccessToken"]:
-        return session.query(AccessToken).filter(AccessToken.id == token_id).first()
-    
-    @staticmethod
-    def get_from_token_id_and_account_id(session, token_id: uuid.UUID, account_id: uuid.UUID) -> Optional["AccessToken"]:
-        return session.query(AccessToken).filter(AccessToken.id == token_id, AccessToken.account_id == account_id).first()
- 
 def refresh_db(write_to_file=False, 
                drop_all=False, 
                url="postgresql://postgres:1234@localhost:6971/cuntydb", 
