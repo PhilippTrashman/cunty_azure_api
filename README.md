@@ -24,7 +24,7 @@ To get started with the Cunty Azure API, follow these steps:
 . .venv/bin/activate | .venv/Scripts/activate
 pip install -m requirements.txt
 ```
-4. setup local.settings.json 
+4. setup `local.settings.json` 
 ```
 {
   "IsEncrypted": false,
