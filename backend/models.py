@@ -1,20 +1,10 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Boolean, create_engine, text
-from sqlalchemy.orm import relationship, sessionmaker, Session, declarative_base
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Boolean
+from sqlalchemy.orm import relationship, Session, declarative_base
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.schema import CreateTable
 
 
-from typing import Optional, List
-from datetime import date
+from typing import List
 import uuid
-
-STUDENT1_ID = uuid.UUID('11111111-1111-1111-1111-111111111111')
-STUDENT2_ID = uuid.UUID('22222222-2222-2222-2222-222222222222')
-TEACHER1_ID = uuid.UUID('33333333-3333-3333-3333-333333333333')
-TEACHER2_ID = uuid.UUID('44444444-4444-4444-4444-444444444444')
-PARENT1_ID = uuid.UUID('55555555-5555-5555-5555-555555555555')
-PARENT2_ID = uuid.UUID('66666666-6666-6666-6666-666666666666')
-SU_ID = uuid.UUID('77777777-7777-7777-7777-777777777777')
 
 
 Base = declarative_base()
@@ -387,7 +377,6 @@ class Account(Base):
 
         return data
 
-
 class Absence(Base):
     __tablename__ = "absence"
 
@@ -645,111 +634,3 @@ class AccessToken(Base):
 
         return data
     
-def refresh_db(write_to_file=False, 
-               drop_all=False, 
-               url="postgresql://postgres:1234@localhost:6971/cuntydb", 
-               generate_accounts=False) -> Optional[dict]:
-    engine = create_engine(url)
-    Session = sessionmaker(engine)
-    with engine.connect() as connection:
-        connection.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'))
-        # Drop all tables
-        if drop_all:
-            Base.metadata.drop_all(bind=engine, checkfirst=False)
-
-        # Recreate all tables
-        Base.metadata.create_all(bind=engine)
-
-        # Write SQL commands to file
-        if write_to_file:
-            with open('create_tables.sql', 'w') as f:
-                for table in Base.metadata.sorted_tables:
-                    f.write(str(CreateTable(table).compile(connection)))
-    if generate_accounts:
-        session = Session()
-        student1_ac = Account(
-            id = STUDENT1_ID,
-            email = 'student1@test.com',
-            password = 'password1',
-            name = 'Test',
-            last_name = 'Student1',
-            username = 'testStudent1',
-            birthday = date(2000, 1, 1)
-        )
-        student2_ac = Account(
-            id = STUDENT2_ID,
-            email = 'student2@test.com',
-            password = 'password2',
-            name = 'Test',
-            last_name = 'Student2',
-            username = 'testStudent2',
-            birthday = date(2000, 1, 1)
-        )
-        teacher1_ac = Account(
-            id = TEACHER1_ID,
-            email = 'teacher1@test.com',
-            password = 'password3',
-            name = 'Test',
-            last_name = 'Teacher1',
-            username = 'testTeacher1',
-            birthday = date(2000, 1, 1)
-        )
-        teacher2_ac = Account(
-            id = TEACHER2_ID,
-            email = 'teacher2@test.com',
-            password = 'password4',
-            name = 'Test',
-            last_name = 'Teacher2',
-            username = 'testTeacher2',
-            birthday = date(2000, 1, 1)
-        )
-        parent1_ac = Account(
-            id = PARENT1_ID,
-            email = 'parent1@test.com',
-            password = 'password5',
-            name = 'Test',
-            last_name = 'Parent1',
-            username = 'testParent1',
-            birthday = date(2000, 1, 1)
-        )
-        parent2_ac = Account(
-            id = PARENT2_ID,
-            email = 'parent2@test.com',
-            password = 'password6',
-            name = 'Test',
-            last_name = 'Parent2',
-            username = 'testParent2',
-            birthday = date(2000, 1, 1)
-        )
-        su_ac = Account(
-            id = SU_ID,
-            email = 'su@test.com',
-            password = 'password7',
-            name = 'Test',
-            last_name = 'SU',
-            username = 'testSU',
-            birthday = date(2000, 1, 1)
-        )
-        crud = CRUD(Session)
-        student1_ac = crud.create(student1_ac)
-        student2_ac = crud.create(student2_ac)
-        teacher1_ac = crud.create(teacher1_ac)
-        teacher2_ac = crud.create(teacher2_ac)
-        parent1_ac = crud.create(parent1_ac)
-        parent2_ac = crud.create(parent2_ac)
-        su_ac = crud.create(su_ac)
-
-        # return {
-        #     'student1': str(student1_ac.id),
-        #     'student2': str(student2_ac.id),
-        #     'teacher1': str(teacher1_ac.id),
-        #     'teacher2': str(teacher2_ac.id),
-        #     'parent1': str(parent1_ac.id),
-        #     'parent2': str(parent2_ac.id),
-        #     'su': str(su_ac.id)
-        # }
-
-
-if __name__ == "__main__":
-    refresh_db(write_to_file=True, drop_all=True, generate_accounts=True)
-    print("Database refreshed")

@@ -10,3 +10,4 @@ types-psycopg2~=2.9.21.20
 sqlalchemy ~= 2.0.29
 
 schedule~=1.2.1
+Faker~=24.11.0
