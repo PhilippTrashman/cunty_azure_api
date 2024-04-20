@@ -27,8 +27,7 @@ print(f"TOKEN: {TOKEN}")
 
 @app.route('fortnite', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_fortnite(req: func.HttpRequest) -> func.HttpResponse:
-    print(get_manifesto())
-    return func.HttpResponse("Fortnite")
+    return func.HttpResponse(get_manifesto(), status_code=226)
 
 @app.route('hello', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_hello_world(req: func.HttpRequest) -> func.HttpResponse:
