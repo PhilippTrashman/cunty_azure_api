@@ -59,27 +59,27 @@ def get_health(req: func.HttpRequest) -> func.HttpResponse:
 @app.route('users', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_users(req: func.HttpRequest) -> func.HttpResponse:
     result = adapters.account_adapter.get_accounts()
-    return func.HttpResponse(result)
+    return func.HttpResponse(json.dumps(result))  
 
 @app.route('users', methods=['POST'], auth_level=func.AuthLevel.ANONYMOUS)
 def post_user(req: func.HttpRequest) -> func.HttpResponse:
     result = adapters.account_adapter.create_account(req.get_json())
-    return func.HttpResponse(result)
+    return func.HttpResponse(json.dumps(result))  
     
 @app.route('users/{username}', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_user(req: func.HttpRequest) -> func.HttpResponse:
     result = adapters.account_adapter.get_account_by_username_or_email(req.route_params.get('username'))
-    return func.HttpResponse(result)  
+    return func.HttpResponse(json.dumps(result))  
 
 @app.route('users/{username}', methods=['PUT'], auth_level=func.AuthLevel.ANONYMOUS)
 def put_user(req: func.HttpRequest) -> func.HttpResponse:
     result = adapters.account_adapter.update_account(req.get_json())
-    return func.HttpResponse(result)
+    return func.HttpResponse(json.dumps(result))  
 
 @app.route('users/{username}', methods=['DELETE'], auth_level=func.AuthLevel.ANONYMOUS)
 def delete_user(req: func.HttpRequest) -> func.HttpResponse:
     result = adapters.account_adapter.delete_account(req.route_params.get('username'))
-    return func.HttpResponse(result)
+    return func.HttpResponse(json.dumps(result))  
 
 @app.route('users/{username}/student', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_student(req: func.HttpRequest) -> func.HttpResponse:
@@ -132,4 +132,15 @@ def get_parent(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse("Not Found", status_code=404)
     result = json.dumps(parent.serialize())
     session.close()
+    return func.HttpResponse(result)
+
+@app.route('users/{username}/abscence', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
+def get_abscences(req: func.HttpRequest) -> func.HttpResponse:
+    session = Session()
+    username = req.route_params.get('username')
+    user = session.query(models.Account).filter(models.Account.username == username).first()
+    if not user:
+        return func.HttpResponse("Not Found", status_code=404)
+    session.close()
+    result = adapters.absence_adapter.get_abscence_by_user(user.id)
     return func.HttpResponse(result)

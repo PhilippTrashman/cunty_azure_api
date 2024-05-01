@@ -10,7 +10,7 @@ class SchoolClassAdapter:
         school_class = SchoolClass(
             name = request['name'],
             grade_id = request['grade_id'],
-            head_teacher_id = request['head_teacher_id'],
+            head_teacher_id = request.get('head_teacher_id', None),
         )
         session.add(school_class)
         session.commit()

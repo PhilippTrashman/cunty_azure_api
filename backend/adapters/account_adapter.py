@@ -10,7 +10,7 @@ class AccountAdapter:
 
     def create_account(self, request: dict) -> dict:
         session = self.Session()
-        birthday = datetime.strptime(request['birthday'], '%Y-%m-%d').date() if 'birthday' in request else None
+        birthday = datetime.datetime.strptime(request['birthday'], '%Y-%m-%d').date() if 'birthday' in request else None
         account = Account(
             username = request['username'],
             password = request['password'],

@@ -11,12 +11,8 @@ class ContactAdapter:
         session = self.Session()
         contact = Contact(
             account_id = request['account_id'],
-            name = request['name'],
-            last_name = request['last_name'],
-            phone = request['phone'],
-            email = request['email'],
-            address = request['address'],
-            birthday = datetime.strptime(request['birthday'], '%Y-%m-%d').date(),
+            contact_type = request.get('contact_type', None),
+            contact = request['contact'],
         )
         session.add(contact)
         session.commit()
@@ -50,12 +46,8 @@ class ContactAdapter:
         contact_id = request['id']
         contact = session.query(Contact).filter(Contact.id == contact_id).first()
         contact.account_id = request.get('account_id', contact.account_id)
-        contact.name = request.get('name', contact.name)
-        contact.last_name = request.get('last_name', contact.last_name)
-        contact.phone = request.get('phone', contact.phone)
-        contact.email = request.get('email', contact.email)
-        contact.address = request.get('address', contact.address)
-        contact.birthday = datetime.strptime(request['birthday'], '%Y-%m-%d').date()
+        contact.contact_type = request.get('contact_type', contact.contact_type)
+        contact.contact = request.get('contact', contact.contact)
         session.commit()
         data = contact.serialize()
         session.close()

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Boolean, CheckConstraint
 from sqlalchemy.orm import relationship, Session, declarative_base
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -108,7 +108,7 @@ class SchoolClass(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     grade_id = Column(Integer, ForeignKey("school_grade.id"), nullable=False)
-    head_teacher_id = Column(Integer, ForeignKey("teacher.id"), nullable=False)
+    head_teacher_id = Column(Integer, ForeignKey("teacher.id"))
 
     grade = relationship("SchoolGrade", back_populates="classes")
     head_teacher = relationship("Teacher", back_populates="school_class")
@@ -122,14 +122,15 @@ class SchoolClass(Base):
             "id": self.id,
             "name": self.name,
             "grade_id": self.grade_id,
-            "head_teacher_id": self.head_teacher_id,
-            "head_teacher": self.head_teacher.account.name + " " + self.head_teacher.account.last_name
+            "head_teacher_id": self.head_teacher_id if self.head_teacher_id else "N/A",
+            "head_teacher_name": self.head_teacher.account.name + " " + self.head_teacher.account.last_name if self.head_teacher_id else "N/A",
+            "head_teacher_abbreviation": self.head_teacher.abbreviation if self.head_teacher_id else "N/A"
         }
 
         if depth > 0:
             data.update({
                 "grade": self.grade.serialize(depth-1),
-                "head_teacher": self.head_teacher.serialize(depth-1),
+                "head_teacher": self.head_teacher.serialize(depth-1) if self.head_teacher_id else None,
                 "students": {s.id: s.serialize(depth-1) for s in self.students}
             })
         
@@ -334,14 +335,14 @@ class Account(Base):
     id = Column(UUID(as_uuid=True), 
                 primary_key=True, 
                 unique=True, 
-                default=uuid.uuid4())
+                default=uuid.uuid4)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     username = Column(String, unique=True, nullable=False)
     birthday = Column(Date)
-    secret = Column(UUID(as_uuid=True), default=uuid.uuid4(), nullable=False)
+    secret = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False)
 
     contacts = relationship("Contact", back_populates="account")
     student = relationship("Student", back_populates="account")
@@ -444,6 +445,11 @@ class SchoolSubject(Base):
     subject_type_id = Column(Integer, ForeignKey("subject_type.id"), nullable=False)
     week_day = Column(Integer, nullable=False)
     timeslot = Column(Integer, nullable=False)
+
+    __table_args__ = (
+        CheckConstraint('week_day >= 1 AND week_day <= 6', name='check_week_day'),
+        CheckConstraint('timeslot >= 1', name='check_timeslot'),
+    )
 
     teacher = relationship("Teacher", back_populates="school_subjects", lazy="joined")
     students = relationship("SchoolSubjectStudent", back_populates="subject", lazy="joined")
