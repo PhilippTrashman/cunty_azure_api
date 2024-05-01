@@ -9,7 +9,7 @@ class SchoolSubjectEntryAdapter:
 
     def create_school_subject_entry(self, request: dict) -> dict:
         session = self.Session()
-        date = datetime.strptime(request['date'], '%Y-%m-%d').date() if 'date' in request else None
+        current_date = datetime.strptime(request['date'], '%Y-%m-%d').date() if 'date' in request else None
         school_subject_entry = SchoolSubjectEntry(
             teacher_id = request.get('teacher_id', None),
             subject_id = request['subject_id'],
@@ -17,7 +17,7 @@ class SchoolSubjectEntryAdapter:
             note = request.get('note', None),
         )
         check_school_subject_entry = session.query(SchoolSubjectEntry).filter(
-            SchoolSubjectEntry.date == date, SchoolSubjectEntry.subject_id == school_subject_entry.date).first()
+            SchoolSubjectEntry.date == current_date, SchoolSubjectEntry.subject_id == school_subject_entry.date).first()
         if check_school_subject_entry:
             raise SubjectEntryAlreadyExists(f"School subject entry for subject {school_subject_entry.subject_id} and date {school_subject_entry.date} already exists")
         
@@ -34,6 +34,25 @@ class SchoolSubjectEntryAdapter:
         session.close()
         return data
     
+    def get_school_subject_entries_for_week(self, week: int, year: int) -> list[dict]:
+        session = self.Session()
+        current_year = year
+        week = int(week)
+        results = {}
+        for i in range(7):
+            try:
+                current_date = date.fromisocalendar(current_year, week, i+1)
+            except ValueError as e:
+                current_year += 1
+                week = week - 52
+                current_date = date.fromisocalendar(current_year, int(week), i+1)
+            school_subject_entries = session.query(SchoolSubjectEntry).filter(SchoolSubjectEntry.date == current_date).all()
+            data = [school_subject_entry.serialize() for school_subject_entry in school_subject_entries]
+            results[str(current_date)] = data
+                
+        session.close()
+        return results
+    
     def get_school_subject_entry(self, school_subject_entry_id: int) -> dict:
         session = self.Session()
         school_subject_entry = session.query(SchoolSubjectEntry).filter(SchoolSubjectEntry.id == school_subject_entry_id).first()
@@ -41,16 +60,22 @@ class SchoolSubjectEntryAdapter:
         session.close()
         return data
     
-    def get_school_subject_entry_for_week(self, subject_id: int, week: int) -> list[dict]:
+    def get_school_subject_entry_for_week(self, subject_id: int, week: int, year: int) -> list[dict]:
         session = self.Session()
-        current_year = date.today().year
+        current_year = year
         results = {}
         for i in range(7):
-            date = date.fromisocalendar(current_year, week, i+1)
+            try:
+                current_date = date.fromisocalendar(current_year, week, i+1)
+            except ValueError as e:
+                current_year += 1
+                week = week - 52
+                current_date = date.fromisocalendar(current_year, week, i+1)
+            
             school_subject_entry = session.query(SchoolSubjectEntry).filter(
-                SchoolSubjectEntry.subject_id == subject_id, SchoolSubjectEntry.date == date).first()
+                SchoolSubjectEntry.subject_id == subject_id, SchoolSubjectEntry.date == current_date).first()
             if school_subject_entry:
-                results[date] = school_subject_entry.serialize()
+                results[current_date] = school_subject_entry.serialize()
 
         session.close()
         return results

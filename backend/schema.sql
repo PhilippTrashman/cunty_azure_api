@@ -113,7 +113,7 @@ CREATE TABLE school_class (
 
 CREATE TABLE school_subject (
 	id SERIAL NOT NULL, 
-	teacher_id INTEGER NOT NULL, 
+	teacher_id INTEGER, 
 	subject_type_id INTEGER NOT NULL, 
 	week_day INTEGER NOT NULL, 
 	timeslot INTEGER NOT NULL, 

@@ -1,3 +1,4 @@
+import itertools
 from sqlalchemy import Column, Integer, String, ForeignKey, Date, DateTime, Boolean, CheckConstraint
 from sqlalchemy.orm import relationship, Session, declarative_base
 from sqlalchemy.dialects.postgresql import UUID
@@ -152,7 +153,7 @@ class Contact(Base):
     def serialize(self, depth=1) -> dict:
         data = {
             "id": self.id,
-            "account_id": self.account_id,
+            # "account_id": self.account_id,
             "contact_type": self.contact_type,
             "contact": self.contact
         }
@@ -252,8 +253,20 @@ class Student(Base):
 
         if depth > 0 or from_account:
             data.update({
-                "parents": {p.id: p.serialize(depth-1, False) for p in self.parents},
-                "school_subjects": {s.id: s.subject.serialize(depth-1) for s in self.school_subjects},
+                "parents": {p.id: p.serialize(depth-1, True) for p in self.parents},
+                "school_subjects": {
+                    day: {
+                        timeslot: [s.serialize(depth-1, True) for s in subjects]
+                        for timeslot, subjects in itertools.groupby(
+                            sorted(day_subjects, key=lambda s: s.subject.timeslot), 
+                            key=lambda s: s.subject.timeslot
+                        )
+                    } 
+                    for day, day_subjects in itertools.groupby(
+                        sorted(self.school_subjects, key=lambda s: s.subject.week_day), 
+                        key=lambda s: s.subject.week_day
+                    )
+                } if self.school_subjects else None,
                 "homework_status": {h.id: h.serialize(depth-1, True) for h in self.homework_status}
             })
         if from_account == False:
@@ -286,8 +299,20 @@ class Teacher(Base):
 
         if depth > 0 or from_account:
             data.update({
-                "school_class": {c.id: c.serialize(depth-1) for c in self.school_class},
-                "school_subjects": {s.id: s.serialize(depth-1) for s in self.school_subjects},
+                "school_class": {c.id: c.serialize(depth-1) for c in self.school_class} if self.school_class else None,
+                "school_subjects": {
+                    day: {
+                        timeslot: [s.serialize(depth-1) for s in subjects]
+                        for timeslot, subjects in itertools.groupby(
+                            sorted(day_subjects, key=lambda s: s.timeslot), 
+                            key=lambda s: s.timeslot
+                        )
+                    } 
+                    for day, day_subjects in itertools.groupby(
+                        sorted(self.school_subjects, key=lambda s: s.week_day), 
+                        key=lambda s: s.week_day
+                    )
+                } if self.school_subjects else None,
             })
         
         if not from_account:
@@ -441,7 +466,7 @@ class SchoolSubject(Base):
     __tablename__ = "school_subject"
 
     id = Column(Integer, primary_key=True)
-    teacher_id = Column(Integer, ForeignKey("teacher.id"), nullable=False)
+    teacher_id = Column(Integer, ForeignKey("teacher.id"))
     subject_type_id = Column(Integer, ForeignKey("subject_type.id"), nullable=False)
     week_day = Column(Integer, nullable=False)
     timeslot = Column(Integer, nullable=False)

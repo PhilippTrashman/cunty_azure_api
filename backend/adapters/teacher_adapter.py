@@ -21,7 +21,7 @@ class TeacherAdapter:
     def get_teachers(self) -> list[dict]:
         session = self.Session()
         teachers = session.query(Teacher).all()
-        data = [teacher.serialize(depth=0) for teacher in teachers]
+        data = [teacher.serialize() for teacher in teachers]
         session.close()
         return data
     
@@ -35,6 +35,8 @@ class TeacherAdapter:
     def get_teacher_by_account(self, account_id: uuid.UUID) -> dict:
         session = self.Session()
         teacher = session.query(Teacher).filter(Teacher.account_id == account_id).first()
+        if teacher == None:
+            raise Exception('Teacher not found')
         data = teacher.serialize()
         session.close()
         return data
@@ -50,11 +52,9 @@ class TeacherAdapter:
         session.close()
         return data
     
-    def delete_teacher(self, teacher_id: int) -> dict:
+    def delete_teacher(self, teacher_id: int) -> None:
         session = self.Session()
         teacher = session.query(Teacher).filter(Teacher.id == teacher_id).first()
         session.delete(teacher)
         session.commit()
-        data = teacher.serialize()
         session.close()
-        return data

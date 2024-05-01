@@ -33,6 +33,13 @@ PARENT2_ID = uuid.UUID('66666666-6666-6666-6666-666666666666')
 SU_ID = uuid.UUID('77777777-7777-7777-7777-777777777777')
 
 class TestDataGenerator:
+    """
+    Generates test data for the database
+    Can Crash at times as it generates Hundreds of random accounts, who all should have unique usernames.
+    This Leads to crashes if the same username or even email is generated twice.
+
+    Just restart the script if it crashes and it should work fine.
+    """
     def __init__(self, database_url: str):
         self.engine = create_engine(database_url)
         self.Session = sessionmaker(bind=self.engine)
@@ -149,6 +156,15 @@ class TestDataGenerator:
             'change_subject_status': True,
             'manage_users': True,
             'manage_school': True
+        })
+
+        self.adapters.teacher_adapter.create_teacher({
+            'account_id': str(TEACHER1_ID),
+            'abbreviation': 'T1'
+        })
+        self.adapters.teacher_adapter.create_teacher({
+            'account_id': str(TEACHER2_ID),
+            'abbreviation': 'T2'
         })
 
     def generate_school_grade(self) -> List[int]:
