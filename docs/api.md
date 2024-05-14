@@ -107,3 +107,36 @@ Body needs to look as follows:
 ### GET User Student Information
 `/api/users/{username}/student`  
 Get a users student info
+
+### POST User Student Information
+`/api/users/{username}/student`
+Create User info  
+Body needs to look as follows  
+``` json
+{
+    "account_id": "users_uuid4",
+    "school_class_id": 23 // id of the school class
+}
+```
+
+returned Object will look like this  
+``` json
+{
+    "id": 1,
+    "school_class_id": 23,
+    "parents": "{}",
+    "school_subjects": 
+}
+```
+
+### PUT User Student Information
+`/api/users/{username}/student`
+Update a users student info  
+Body needs to include the wanted changes, meaning the classes
+
+``` json
+{
+    "school_class_id": 3
+}
+```
+

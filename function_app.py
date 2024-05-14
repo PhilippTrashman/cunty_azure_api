@@ -166,6 +166,9 @@ def put_user_student(req: func.HttpRequest) -> func.HttpResponse:
     user = session.query(models.Account).filter(models.Account.username == username).first()
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
+    request = req.get_json
+    request["account_id"] = str(user.id)
+    request["id"] = user.student.id
     session.close()
     result = adapters.student_adapter.update_student(req.get_json())
     return func.HttpResponse(json.dumps(result))
@@ -179,8 +182,8 @@ def delete_user_student(req: func.HttpRequest) -> func.HttpResponse:
     user = session.query(models.Account).filter(models.Account.username == username).first()
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
+    result = adapters.student_adapter.delete_student(user.student.id)
     session.close()
-    result = adapters.student_adapter.delete_student(user.id)
     return func.HttpResponse(json.dumps(result))
 
 
