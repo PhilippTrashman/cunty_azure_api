@@ -140,3 +140,83 @@ Body needs to include the wanted changes, meaning the classes
 }
 ```
 
+### DELETE User Student Information
+`/api/users/{username}/student`
+Deletes a users Student Information  
+**not reversible** so use with caution
+
+## Student Calls
+
+### GET Students
+`/api/students`
+Get every student
+
+### Get Student
+`/api/students/{student_id}`
+id is an Integer  
+Returns the Student information associated with the id
+
+## Parent Calls
+
+### GET Parents
+
+### GET Parent
+
+
+## Teacher Calls
+
+### GET Teachers
+
+### GET Teacher
+
+## SU Calls
+
+### GET SUs
+
+### GET SU
+
+
+## School Classes Calls
+
+### GET School Classes
+
+### GET School Class
+
+### POST School Class
+
+### PUT School Class
+
+### DELETE School Class
+
+## School Grade Calls
+
+### GET School Grades
+
+### GET School Grade
+
+### PUT School Grade
+
+### DELETE School Grade
+
+## School Subject Calls
+
+### GET School Subjects
+`/api/school_subjects`  
+
+
+### POST School Subject
+`/api/school_subjects`  
+
+### GET School Subject
+`/api/school_subjects/{school_subject_id}`  
+school_subject_id is an Int  
+
+### PUT School Subject
+
+
+### DELETE School Subject
+
+
+## School Subject Entry Calls
+
+
