@@ -37,7 +37,7 @@ def get_fortnite(req: func.HttpRequest) -> func.HttpResponse:
 def get_hello_world(req: func.HttpRequest) -> func.HttpResponse:
     if not verify_token(req):
         return func.HttpResponse("Unauthorized", status_code=401)
-    return func.HttpResponse(f"Hello World")
+    return func.HttpResponse(f"Hello World!")
 
 @app.route('login', methods=['POST'], auth_level=func.AuthLevel.ANONYMOUS)
 def post_login(req: func.HttpRequest) -> func.HttpResponse:
