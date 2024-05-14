@@ -49,16 +49,16 @@ def post_login(req: func.HttpRequest) -> func.HttpResponse:
         username = data.get('username')
         password = data.get('password')
         user = adapters.account_adapter.get_account_by_username_or_email(username)
-        if user and user.password == password:
-            data = user.serialize()
+        if user and adapters.account_adapter.check_account_password(username, password):
             session.close()
-            return func.HttpResponse(json.dumps(data))
+            return func.HttpResponse(json.dumps(user))
     
         return func.HttpResponse("Unauthorized", status_code=401)
     except UserNotFound as e:
         return func.HttpResponse(str(e), status_code=e.status_code)
     except Exception as e:
         return func.HttpResponse(str(e), status_code=500)
+        
 
 @app.route('health', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_health(req: func.HttpRequest) -> func.HttpResponse:

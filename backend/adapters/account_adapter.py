@@ -25,6 +25,16 @@ class AccountAdapter:
         session.close()
         return data
     
+    def check_account_password(self, username: str, password: str) -> bool:
+        session = self.Session()
+        account = session.query(Account).filter(Account.username == username).first()
+        if not account:
+            account = session.query(Account).filter(Account.email == username).first()
+        if not account:
+            raise EntityNotFound(f"Account with username or email {username} not found")
+        session.close()
+        return account.password == password
+    
     def get_accounts(self) -> list[dict]:
         session = self.Session()
         accounts = session.query(Account).all()
