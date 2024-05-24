@@ -89,7 +89,10 @@ def get_user(req: func.HttpRequest) -> func.HttpResponse:
 def put_user(req: func.HttpRequest) -> func.HttpResponse:
     if not verify_token(req):
         return func.HttpResponse("Unauthorized", status_code=401)
-    result = adapters.account_adapter.update_account(req.get_json())
+    user = adapters.account_adapter.get_account_by_username_or_email(req.route_params.get('username'))
+    if not user:
+        return func.HttpResponse("Not Found", status_code=404)
+    result = adapters.account_adapter.update_account(req.get_json(), user['id'])
     return func.HttpResponse(json.dumps(result))  
 
 @app.route('users/{username}', methods=['DELETE'], auth_level=func.AuthLevel.ANONYMOUS)

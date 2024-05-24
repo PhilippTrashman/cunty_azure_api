@@ -60,9 +60,9 @@ class AccountAdapter:
         session.close()
         return data
     
-    def update_account(self, request: dict) -> dict:
+    def update_account(self, request: dict, account_id: uuid.UUID) -> dict:
         session = self.Session()
-        account_id = request['id']
+        account_id = uuid.UUID(account_id)
         birthday = datetime.strptime(request['birthday'], '%Y-%m-%d').date() if 'birthday' in request else None
         account = session.query(Account).filter(Account.id == account_id).first()
         account.username = request.get('username', account.username)
