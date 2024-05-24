@@ -387,6 +387,7 @@ class Account(Base):
             "name": self.name,
             "last_name": self.last_name,
             "birthday": str(self.birthday),
+            "username": self.username,
         }
 
         if depth > 0:
