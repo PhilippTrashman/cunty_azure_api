@@ -96,7 +96,10 @@ def put_user(req: func.HttpRequest) -> func.HttpResponse:
 def delete_user(req: func.HttpRequest) -> func.HttpResponse:
     if not verify_token(req):
         return func.HttpResponse("Unauthorized", status_code=401)
-    result = adapters.account_adapter.delete_account(req.route_params.get('username'))
+    user = adapters.account_adapter.get_account_by_username_or_email(req.route_params.get('username'))
+    if not user:
+        return func.HttpResponse("Not Found", status_code=404)
+    result = adapters.account_adapter.delete_account(user['id'])
     return func.HttpResponse(json.dumps(result))  
 
 @app.route('users/{username}/contact', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
