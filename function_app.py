@@ -41,6 +41,7 @@ def get_hello_world(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.route('login', methods=['POST'], auth_level=func.AuthLevel.ANONYMOUS)
 def post_login(req: func.HttpRequest) -> func.HttpResponse:
+    token = req.headers.get('Authorization')
     if not verify_token(req):
         return func.HttpResponse("Unauthorized", status_code=401)
     try:
@@ -190,7 +191,7 @@ def delete_user_student(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse("Not Found", status_code=404)
     result = adapters.student_adapter.delete_student(user.student.id)
     session.close()
-    return func.HttpResponse(json.dumps(result))
+    return func.HttpResponse('OK', status_code=200)
 
 
 @app.route('users/{username}/teacher', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)

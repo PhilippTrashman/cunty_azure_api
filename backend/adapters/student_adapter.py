@@ -57,12 +57,10 @@ class StudentAdapter:
         session.close()
         return data
     
-    def delete_student(self, student_id: int) -> dict:
+    def delete_student(self, student_id: int) -> None:
         session = self.Session()
         student = session.query(Student).filter(Student.id == student_id).first()
         session.delete(student)
         session.commit()
-        data = student.serialize()
         session.close()
-        return data
     

@@ -206,7 +206,7 @@ class Parent(Base):
     __tablename__ = "parent"
     id = Column(Integer, primary_key=True)
     account_id = Column(UUID(as_uuid=True), ForeignKey("account.id"), unique=True, nullable=False)
-    children = relationship("ParentStudent", back_populates="parent")
+    children = relationship("ParentStudent", back_populates="parent", cascade="all, delete-orphan, delete")
     account = relationship("Account", back_populates="parent")
 
     def __repr__(self) -> str:
@@ -236,11 +236,11 @@ class Student(Base):
     account_id = Column(UUID(as_uuid=True), ForeignKey("account.id"), nullable=False, unique=True)
     school_class_id = Column(Integer, ForeignKey("school_class.id"))
 
-    parents = relationship("ParentStudent", back_populates="student")
+    parents = relationship("ParentStudent", back_populates="student", cascade="all, delete-orphan, delete")
     account = relationship("Account", back_populates="student")
     school_class = relationship("SchoolClass", back_populates="students")
-    school_subjects = relationship("SchoolSubjectStudent", back_populates="student")
-    homework_status = relationship("HomeworkStatus", back_populates="student")
+    school_subjects = relationship("SchoolSubjectStudent", back_populates="student", cascade="all, delete-orphan, delete")
+    homework_status = relationship("HomeworkStatus", back_populates="student", cascade="all, delete-orphan, delete")
 
     def __repr__(self) -> str:
         return f"Student(id={self.id}, account_id={self.account_id}, school_class_id={self.school_class_id})"
@@ -369,14 +369,14 @@ class Account(Base):
     birthday = Column(Date)
     secret = Column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False)
 
-    contacts = relationship("Contact", back_populates="account")
-    student = relationship("Student", back_populates="account")
-    parent = relationship("Parent", back_populates="account")
-    teacher = relationship("Teacher", back_populates="account")
-    su = relationship("Su", back_populates="account")
+    contacts = relationship("Contact", back_populates="account", cascade="all, delete-orphan, delete")
+    student = relationship("Student", back_populates="account", uselist=False, cascade="all, delete-orphan, delete")
+    parent = relationship("Parent", back_populates="account", uselist=False, cascade="all, delete-orphan, delete")
+    teacher = relationship("Teacher", back_populates="account", uselist=False, cascade="all, delete-orphan, delete")
+    su = relationship("Su", back_populates="account", uselist=False, cascade="all, delete-orphan, delete")
 
-    absences = relationship("Absence", back_populates="account")
-    access_tokens = relationship("AccessToken", back_populates="account")
+    absences = relationship("Absence", back_populates="account", cascade="all, delete-orphan, delete")
+    access_tokens = relationship("AccessToken", back_populates="account", cascade="all, delete-orphan, delete")
 
     def __repr__(self) -> str:
         return f"Account(id={self.id}, email={self.email}, password={self.password}, name={self.name}, last_name={self.last_name}, username={self.username}, birthday={self.birthday})"
