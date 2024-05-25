@@ -41,7 +41,6 @@ def get_hello_world(req: func.HttpRequest) -> func.HttpResponse:
 
 @app.route('login', methods=['POST'], auth_level=func.AuthLevel.ANONYMOUS)
 def post_login(req: func.HttpRequest) -> func.HttpResponse:
-    token = req.headers.get('Authorization')
     if not verify_token(req):
         return func.HttpResponse("Unauthorized", status_code=401)
     try:

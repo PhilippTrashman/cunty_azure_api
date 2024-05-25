@@ -395,10 +395,10 @@ class Account(Base):
                 "username": self.username,
                 "email": self.email,
                 "contacts": {c.id: c.serialize(depth-1) for c in self.contacts},
-                "student": {s.id: s.serialize(depth-1, True) for s in self.student},
-                "parent": {p.id: p.serialize(depth-1, True) for p in self.parent},
-                "teacher": {t.id: t.serialize(depth-1, True) for t in self.teacher},
-                "su": {s.id: s.serialize(depth-1, True) for s in self.su},
+                "student": self.student.serialize(depth-1, True) if self.student else None,
+                "parent": self.parent.serialize(depth-1, True) if self.parent else None,
+                "teacher": self.teacher.serialize(depth-1, True) if self.teacher else None,
+                "su": self.su.serialize(depth-1, True) if self.su else None,
                 "absences": {a.id: a.serialize(depth-1) for a in self.absences},
             })
 
