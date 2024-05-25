@@ -21,7 +21,7 @@ class TeacherAdapter:
     def get_teachers(self) -> list[dict]:
         session = self.Session()
         teachers = session.query(Teacher).all()
-        data = [teacher.serialize() for teacher in teachers]
+        data = [teacher.serialize(0) for teacher in teachers]
         session.close()
         return data
     
