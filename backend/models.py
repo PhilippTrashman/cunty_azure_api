@@ -491,9 +491,9 @@ class SchoolSubject(Base):
             "week_day": self.week_day,
             "timeslot": self.timeslot,
             "subject": self.subject_type.name,
-            "teacher_id": self.teacher_id,
-            "teacher": self.teacher.account.name + " " + self.teacher.account.last_name,
-            "teacher_abbreviation": self.teacher.abbreviation if self.teacher.abbreviation else "N/A"
+            "teacher_id": self.teacher_id if self.teacher_id else "N/A",
+            "teacher": self.teacher.account.name + " " + self.teacher.account.last_name if self.teacher_id else "N/A",
+            "teacher_abbreviation": self.teacher.abbreviation if self.teacher_id else "N/A"
         }
 
         if depth > 0:
