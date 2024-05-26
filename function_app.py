@@ -102,8 +102,8 @@ def delete_user(req: func.HttpRequest) -> func.HttpResponse:
     user = adapters.account_adapter.get_account_by_username_or_email(req.route_params.get('username'))
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
-    result = adapters.account_adapter.delete_account(user['id'])
-    return func.HttpResponse(json.dumps(result))  
+    adapters.account_adapter.delete_account(user['id'])
+    return func.HttpResponse("OK", status_code=200)  
 
 @app.route('users/{username}/contact', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_user_contact(req: func.HttpRequest) -> func.HttpResponse:

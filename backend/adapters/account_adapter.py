@@ -76,12 +76,10 @@ class AccountAdapter:
         session.close()
         return data
     
-    def delete_account(self, account_id: uuid.UUID) -> dict:
+    def delete_account(self, account_id: uuid.UUID) -> None:
         session = self.Session()
         account = session.query(Account).filter(Account.id == account_id).first()
         session.delete(account)
         session.commit()
-        data = account.serialize()
         session.close()
-        return data
 
