@@ -158,6 +158,9 @@ def post_user_student(req: func.HttpRequest) -> func.HttpResponse:
     user = session.query(models.Account).filter(models.Account.username == username).first()
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
+    student = user.student
+    if student:
+        return func.HttpResponse("Conflict", status_code=409)
     user_id = user.id
     request = req.get_json()
     request["account_id"] = str(user_id)
@@ -223,8 +226,13 @@ def post_user_teacher(req: func.HttpRequest) -> func.HttpResponse:
     user = session.query(models.Account).filter(models.Account.username == username).first()
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
+    teacher = adapters.teacher_adapter.get_teacher_by_account(user.id)
+    if teacher:
+        return func.HttpResponse("Conflict", status_code=409)
+    request = req.get_json()
+    request["account_id"] = str(user.id)
     session.close()
-    result = adapters.teacher_adapter.create_teacher(req.get_json())
+    result = adapters.teacher_adapter.create_teacher(request)
     return func.HttpResponse(json.dumps(result))
 
 @app.route('users/{username}/teacher', methods=['PUT'], auth_level=func.AuthLevel.ANONYMOUS)
@@ -283,7 +291,9 @@ def post_user_su(req: func.HttpRequest) -> func.HttpResponse:
     su = user.su
     if su:
         return func.HttpResponse("Conflict", status_code=409)
-    result = adapters.su_adapter.create_su(req.get_json())
+    request = req.get_json()
+    request["account_id"] = str(user.id)
+    result = adapters.su_adapter.create_su(request)
     return func.HttpResponse(json.dumps(result))
 
 @app.route('users/{username}/su', methods=['PUT'], auth_level=func.AuthLevel.ANONYMOUS)
@@ -293,6 +303,8 @@ def put_user_su(req: func.HttpRequest) -> func.HttpResponse:
     session = Session()
     username = req.route_params.get('username')
     user = session.query(models.Account).filter(models.Account.username == username).first()
+    if not user:
+        return func.HttpResponse("Not Found", status_code=404)
     su = user.su
     if not su:
         return func.HttpResponse("Not Found", status_code=404)
@@ -334,10 +346,15 @@ def post_user_parent(req: func.HttpRequest) -> func.HttpResponse:
     session = Session()
     username = req.route_params.get('username')
     user = session.query(models.Account).filter(models.Account.username == username).first()
+    if not user:
+        return func.HttpResponse("Not Found", status_code=404)
     parent = user.parent
     if parent:
         return func.HttpResponse("Conflict", status_code=409)
-    result = adapters.parent_adapter.create_parent(req.get_json())
+    request = req.get_json(force=True)
+    request["account_id"] = str(user.id)
+    result = adapters.parent_adapter.create_parent(request)
+    session.close()
     return func.HttpResponse(json.dumps(result))
 
 @app.route('users/{username}/parent', methods=['PUT'], auth_level=func.AuthLevel.ANONYMOUS)
