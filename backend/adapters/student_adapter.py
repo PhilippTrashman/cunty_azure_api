@@ -10,7 +10,7 @@ class StudentAdapter:
         session = self.Session()
         student = Student(
             account_id = uuid.UUID(request['account_id']),
-            school_class_id = request['school_class_id'],
+            school_class_id = request.get('school_class_id', None),
         )
         session.add(student)
         session.commit()

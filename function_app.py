@@ -104,7 +104,6 @@ def delete_user(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse("Not Found", status_code=404)
     adapters.account_adapter.delete_account(user['id'])
     return func.HttpResponse("OK", status_code=200)  
-
 @app.route('users/{username}/contact', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
 def get_user_contact(req: func.HttpRequest) -> func.HttpResponse:
     if not verify_token(req):
@@ -159,8 +158,11 @@ def post_user_student(req: func.HttpRequest) -> func.HttpResponse:
     user = session.query(models.Account).filter(models.Account.username == username).first()
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
+    user_id = user.id
+    request = req.get_json()
+    request["account_id"] = str(user_id)
     session.close()
-    result = adapters.student_adapter.create_student(req.get_json())
+    result = adapters.student_adapter.create_student(request)
     return func.HttpResponse(json.dumps(result))
 
 @app.route('users/{username}/student', methods=['PUT'], auth_level=func.AuthLevel.ANONYMOUS)
