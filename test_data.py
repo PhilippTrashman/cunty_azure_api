@@ -31,6 +31,7 @@ TEACHER2_ID = uuid.UUID('44444444-4444-4444-4444-444444444444')
 PARENT1_ID = uuid.UUID('55555555-5555-5555-5555-555555555555')
 PARENT2_ID = uuid.UUID('66666666-6666-6666-6666-666666666666')
 SU_ID = uuid.UUID('77777777-7777-7777-7777-777777777777')
+HEAD_TEACHER_ID = uuid.UUID('88888888-8888-8888-8888-888888888888')
 
 class TestDataGenerator:
     """
@@ -180,14 +181,33 @@ class TestDataGenerator:
     def generate_school_classes(self) -> dict[int, list[int]]:
         print("Generating school classes")
         classes = {}
+        crud = CRUD(self.Session)
+
+        head_teacher_ac = Account(
+            id = HEAD_TEACHER_ID,
+            email = 'm.skibidi@test.com',
+            password = 'password8',
+            name = 'Michael',
+            last_name = 'Skibidi',
+            username = 'headteacher',
+            birthday = date(1969, 4, 20)
+        )
+        head_teacher_ac = crud.create(head_teacher_ac)
+        teacher_id = self.adapters.teacher_adapter.create_teacher({
+            'account_id': str(HEAD_TEACHER_ID),
+            'abbreviation': 'HT'
+        })['id']
+        
         for grade_id in self.grade_ids:
             class1 = self.adapters.school_class_adapter.create_school_class({
                 'grade_id': grade_id,
-                'name': 'A'
+                'name': 'A',
+                'head_teacher_id': teacher_id
             })
             class2 = self.adapters.school_class_adapter.create_school_class({
                 'grade_id': grade_id,
-                'name': 'B'
+                'name': 'B',
+                'head_teacher_id': teacher_id
             })
             classes[grade_id] = [class1['id'], class2['id']]
         return classes
@@ -334,10 +354,6 @@ class TestDataGenerator:
                     if username in list_usernames:
                         continue
                     list_usernames.append(username)
-                    # email = f"{first_name}.{last_name}@example{i}.com"
-                    # if email in list_emails:
-                    #     continue
-                    # list_emails.append(email)
 
                     account = {
                         'email': self.fake.email(),
