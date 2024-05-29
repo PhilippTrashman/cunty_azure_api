@@ -174,14 +174,12 @@ def put_user_student(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse("Unauthorized", status_code=401)
     session = Session()
     username = req.route_params.get('username')
-    user = session.query(models.Account).filter(models.Account.username == username).first()
+    user = adapters.account_adapter.get_account_by_username_or_email(username)
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
-    request = req.get_json
-    user_id = user.id
-    student_id = user.student.id
-    request["account_id"] = str(user_id)
-    request["id"] = student_id
+    request = req.get_jso
+    request["account_id"] = user['id']
+    request["id"] = user['student']['id']
     session.close()
     result = adapters.student_adapter.update_student(req.get_json())
     return func.HttpResponse(json.dumps(result))
