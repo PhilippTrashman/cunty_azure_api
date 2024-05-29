@@ -177,7 +177,7 @@ def put_user_student(req: func.HttpRequest) -> func.HttpResponse:
     user = adapters.account_adapter.get_account_by_username_or_email(username)
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
-    request = req.get_jso
+    request = req.get_json()
     request["account_id"] = user['id']
     request["id"] = user['student']['id']
     session.close()
