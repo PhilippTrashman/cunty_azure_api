@@ -245,8 +245,10 @@ def put_user_teacher(req: func.HttpRequest) -> func.HttpResponse:
     user = session.query(models.Account).filter(models.Account.username == username).first()
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
+    request = req.get_json()
+    request["id"] = user.teacher.id
     session.close()
-    result = adapters.teacher_adapter.update_teacher(req.get_json())
+    result = adapters.teacher_adapter.update_teacher(request)
     return func.HttpResponse(json.dumps(result))
 
 @app.route('users/{username}/teacher', methods=['DELETE'], auth_level=func.AuthLevel.ANONYMOUS)
