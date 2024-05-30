@@ -46,10 +46,10 @@ class StudentAdapter:
         session.close()
         return data
     
-    def update_student(self, request: dict, user_id: uuid.UUID) -> dict:
+    def update_student(self, request: dict) -> dict:
         session = self.Session()
-        student = session.query(Student).filter(Student.id == user_id).first()
-        student.account_id = request.get('account_id', student.account_id)
+        student_id = request['id']
+        student = session.query(Student).filter(Student.id == student_id).first()
         student.school_class_id = request.get('school_class_id', student.school_class_id)
         session.commit()
         data = student.serialize()

@@ -178,9 +178,8 @@ def put_user_student(req: func.HttpRequest) -> func.HttpResponse:
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
     request = req.get_json()
-    user_serialized = user.serialize(1)
-    request["account_id"] = user_serialized['id']
-    result = adapters.student_adapter.update_student(req.get_json(), user.id)
+    request["id"] = user.student.id
+    result = adapters.student_adapter.update_student(request)
     session.close()
     return func.HttpResponse(json.dumps(result))
 
