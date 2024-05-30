@@ -253,6 +253,7 @@ class Student(Base):
 
         if depth > 0 or from_account:
             data.update({
+                "school_class": self.school_class.serialize(depth-1),
                 "parents": {p.id: p.serialize(depth-1, True) for p in self.parents},
                 "school_subjects": {
                     day: {

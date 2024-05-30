@@ -48,11 +48,9 @@ class ParentAdapter:
         session.close()
         return data
     
-    def delete_parent(self, parent_id: int) -> dict:
+    def delete_parent(self, parent_id: int) -> None:
         session = self.Session()
         parent = session.query(Parent).filter(Parent.id == parent_id).first()
         session.delete(parent)
         session.commit()
-        data = parent.serialize()
         session.close()
-        return data

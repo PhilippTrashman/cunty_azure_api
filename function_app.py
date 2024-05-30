@@ -178,7 +178,8 @@ def put_user_student(req: func.HttpRequest) -> func.HttpResponse:
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
     request = req.get_json()
-    request["account_id"] = user.serialize()['id']
+    user_serialized = user.serialize(1)
+    request["account_id"] = user_serialized['id']
     result = adapters.student_adapter.update_student(req.get_json(), user.id)
     session.close()
     return func.HttpResponse(json.dumps(result))
@@ -379,8 +380,8 @@ def delete_user_parent(req: func.HttpRequest) -> func.HttpResponse:
     parent = user.parent
     if not parent:
         return func.HttpResponse("Not Found", status_code=404)
-    result = adapters.parent_adapter.delete_parent(parent.id)
-    return func.HttpResponse(json.dumps(result))
+    adapters.parent_adapter.delete_parent(parent.id)
+    return func.HttpResponse(f"Deleted {username}", status_code=200)
 
 
 @app.route('users/{username}/abscence', methods=['GET'], auth_level=func.AuthLevel.ANONYMOUS)
