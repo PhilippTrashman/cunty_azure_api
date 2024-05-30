@@ -226,9 +226,10 @@ def post_user_teacher(req: func.HttpRequest) -> func.HttpResponse:
     user = session.query(models.Account).filter(models.Account.username == username).first()
     if not user:
         return func.HttpResponse("Not Found", status_code=404)
-    teacher = adapters.teacher_adapter.get_teacher_by_account(user.id)
-    if teacher:
-        return func.HttpResponse("Conflict", status_code=409)
+    try:
+        teacher = adapters.teacher_adapter.get_teacher_by_account(user.id)
+    except Exception as e:
+        pass
     request = req.get_json()
     request["account_id"] = str(user.id)
     session.close()
