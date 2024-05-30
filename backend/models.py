@@ -296,6 +296,7 @@ class Teacher(Base):
     def serialize(self, depth=1, from_account = False) -> dict:
         data = {
             "id": self.id,
+            "abbreviation": self.abbreviation,
         }
 
         if depth > 0 or from_account:
