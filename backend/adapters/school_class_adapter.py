@@ -47,9 +47,9 @@ class SchoolClassAdapter:
     def delete_school_class(self, school_class_id: int) -> dict:
         session = self.Session()
         school_class = session.query(SchoolClass).filter(SchoolClass.id == school_class_id).first()
+        data = school_class.serialize()
         session.delete(school_class)
         session.commit()
-        data = school_class.serialize()
         session.close()
         return data
     

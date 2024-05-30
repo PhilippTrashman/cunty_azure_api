@@ -43,8 +43,8 @@ class SchoolGradeAdapter:
     def delete_school_grade(self, school_grade_id: int) -> dict:
         session = self.Session()
         school_grade = session.query(SchoolGrade).filter(SchoolGrade.id == school_grade_id).first()
+        data = school_grade.serialize()
         session.delete(school_grade)
         session.commit()
-        data = school_grade.serialize()
         session.close()
         return data

@@ -60,9 +60,9 @@ class ParentStudentAdapter:
     def delete_parent_student(self, parent_student_id: int) -> dict:
         session = self.Session()
         parent_student = session.query(ParentStudent).filter(ParentStudent.id == parent_student_id).first()
+        data = parent_student.serialize()
         session.delete(parent_student)
         session.commit()
-        data = parent_student.serialize()
         session.close()
         return data
     

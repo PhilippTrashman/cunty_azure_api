@@ -96,9 +96,9 @@ class SchoolSubjectEntryAdapter:
     def delete_school_subject_entry(self, school_subject_entry_id: int) -> dict:
         session = self.Session()
         school_subject_entry = session.query(SchoolSubjectEntry).filter(SchoolSubjectEntry.id == school_subject_entry_id).first()
+        data = school_subject_entry.serialize()
         session.delete(school_subject_entry)
         session.commit()
-        data = school_subject_entry.serialize()
         session.close()
         return data
     

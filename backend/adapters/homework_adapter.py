@@ -46,9 +46,9 @@ class HomeworkAdapter:
     def delete_homework(self, homework_id: int) -> dict:
         session = self.Session()
         homework = session.query(Homework).filter(Homework.id == homework_id).first()
+        data = homework.serialize()
         session.delete(homework)
         session.commit()
-        data = homework.serialize()
         session.close()
         return data
     

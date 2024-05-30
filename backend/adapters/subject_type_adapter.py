@@ -45,9 +45,9 @@ class SubjectTypeAdapter:
     def delete_subject_type(self, subject_type_id: int) -> dict:
         session = self.Session()
         subject_type = session.query(SubjectType).filter(SubjectType.id == subject_type_id).first()
+        data = subject_type.serialize()
         session.delete(subject_type)
         session.commit()
-        data = subject_type.serialize()
         session.close()
         return data
     
