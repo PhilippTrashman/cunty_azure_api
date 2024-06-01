@@ -58,3 +58,4 @@ class TeacherAdapter:
         session.delete(teacher)
         session.commit()
         session.close()
+        

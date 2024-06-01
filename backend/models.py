@@ -123,6 +123,7 @@ class SchoolClass(Base):
             "id": self.id,
             "name": self.name,
             "grade_id": self.grade_id,
+            "grade_year": self.grade.year,
             "head_teacher_id": self.head_teacher_id if self.head_teacher_id else "N/A",
             "head_teacher_name": self.head_teacher.account.name + " " + self.head_teacher.account.last_name if self.head_teacher_id else "N/A",
             "head_teacher_abbreviation": self.head_teacher.abbreviation if self.head_teacher_id else "N/A"
