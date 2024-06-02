@@ -562,8 +562,11 @@ def get_parent(req: func.HttpRequest) -> func.HttpResponse:
     try:
         if not verify_token(req):
             return func.HttpResponse("Unauthorized", status_code=401)
-        result = adapters.parent_adapter.get_parent(req.route_params.get('parent_id'))
-        return func.HttpResponse(json.dumps(result))
+        try:
+            result = adapters.parent_adapter.get_parent(req.route_params.get('parent_id'))
+            return func.HttpResponse(json.dumps(result))
+        except ParentNotFound as e:
+            return func.HttpResponse(str(e), status_code=e.status_code)
     except Exception as e:
         return func.HttpResponse(str(e), status_code=500)
 

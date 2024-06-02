@@ -1,3 +1,4 @@
+from backend.errors import ParentNotFound
 from backend.models import Parent
 from sqlalchemy.orm import Session, sessionmaker
 import uuid
@@ -27,6 +28,8 @@ class ParentAdapter:
     def get_parent(self, parent_id: int) -> dict:
         session = self.Session()
         parent = session.query(Parent).filter(Parent.id == parent_id).first()
+        if parent == None:
+            raise ParentNotFound('Parent not found')
         data = parent.serialize()
         session.close()
         return data

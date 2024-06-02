@@ -24,6 +24,11 @@ class UserNotParent(Exception):
         super().__init__(message)
         self.status_code = 404
 
+class ParentNotFound(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+        self.status_code = 404
+
 class StudentCantBeSu(Exception):
     def __init__(self, message):
         super().__init__(message)
