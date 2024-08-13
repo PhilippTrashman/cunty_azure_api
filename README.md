@@ -1,8 +1,9 @@
 # Cunty Azure API
 
 The Cunty Azure API is a powerful tool for interacting with with my utmost insanity.  
+Its purpose was to to make creating a school planner app easier by moving the Database to central location, as most students didnt know the first thing about api's oder databases
 The entire tool was written in a manic episode in a single weekend.  
-If the documentation is not written, write it yourself ig.  
+If the documentation is not written, write it yourself.  
 
 ## Features
 
